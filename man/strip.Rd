@@ -2,12 +2,12 @@
 % Please edit documentation in R/strip.r
 \name{strip}
 \alias{strip}
-\title{strip out extreme outlier locations from Argos data}
+\title{Strip Argos track data of unwanted records}
 \usage{
-strip(dat, min.obs = 20, min.days = 1, vmax = 10, dmax = 500)
+strip(dat, what = rep(1, 6), min.obs = 30, min.days = 10)
 }
 \arguments{
-\item{dat}{A data_frame containing the following columns: 
+\item{dat}{A data.frame containing the following columns:
 "id", "date", "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
 "date" is the GMT date-time of each observation with the following format
 "2001-11-13 07:59:59". "lc" is the Argos location quality class of each
@@ -16,16 +16,15 @@ observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
 observed latitude in decimal degress.}
 }
 \value{
-A list is returned with each outer list element corresponding to each unique 
-individual id in the input data. The output data_frames include an additional column, labelled
-"filt" which is a logical vector indicating whether location is to be used in subsequent steps
+A list is returned with each outer list element corresponding to each unique
+individual id in the input data.
 }
 \description{
-Use \code{diveMove::grpSpeedFilter} & \code{geosphere::distGeo} to identify extreme 
-outlier locations prior to \code{feed}-ing to \code{ssmTMB::fit_ssm}. Outliers are not 
-removed but flagged with a logical vector so they can be ignored when \code{feed}-ing 
-to \code{ssmTMB::fit_ssm}. \code{geosphere::distGeo} is only used for the first and
-last locations, which aren't handled by \code{diveMove::grpSpeedFilter}.
+Strip does the following:  1) removes duplicated date records; 2) removes start locations in
+N Hemisphere, eg. Seattle, BAS, SMRU (will be generalised later); 3) removes deployments with
+less than min.obs records; 4) removes deployments that last less than min.days; 5) removes
+records with NA lat and/or lon; 6) shifts 0, 360 longitudes to -180, 180. Each of these steps
+can be optionally turned off.
 }
 \examples{
 \dontrun{

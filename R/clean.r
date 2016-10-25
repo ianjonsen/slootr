@@ -24,7 +24,6 @@
 #' @examples
 #' \dontrun{
 #' }
-#' @importFrom ssmTMB fit_ssm
 #' @importFrom diveMove grpSpeedFilter
 #' @importFrom geosphere distGeo
 #' @importFrom pbapply pblapply

@@ -1,0 +1,16 @@
+Package: slootr
+Title: R tools for manipulating Argos tracking data
+Version: 0.0.1.9000
+Authors@R: c(
+    person("Ian", "Jonsen", email = "ian.jonsen@mq.edu.au", role = c("aut", "cre"))
+    )
+Description: Pre-filters, organises and feeds Argos satellite tracking data to ssmTMB::fit_ssm
+Depends:
+    R (>= 3.3.0),
+    ssmTMB
+License: GPL-2
+Encoding: UTF-8
+LazyData: true
+URL: http://github.com/ianjonsen/slootr
+BugReports: http://github.com/ianjonsen/issues
+RoxygenNote: 5.0.1

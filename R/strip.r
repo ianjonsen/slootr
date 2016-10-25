@@ -15,7 +15,9 @@
 #' observed latitude in decimal degress. 
 #' 
 #' @return A list is returned with each outer list element corresponding to each unique 
-#' individual id in the input data. 
+#' individual id in the input data. The output data_frames include an additional column, labelled
+#' "filt" which is a logical vector indicating whether location is to be used in subsequent steps
+#' 
 #' @author Ian Jonsen
 #' 
 #' @examples
@@ -35,9 +37,11 @@ strip <-
            dmax = 500
            ) {
     
+    d <- split(dat, dat$id)
+    
     ## flag extreme travel rate locations for removal at ssm filter stage
     options("pbapply" = "txt")
-    x <- pblapply(dat, function(k) {
+    dd <- pblapply(d, function(k) {
       k$filt <-
         try(with(k, grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax)), silent =
               TRUE)
@@ -45,7 +49,7 @@ strip <-
     })
     
     ## speed filter doesn't flag first or last locations so use a distance threshold of dmax km
-    y <- lapply(x, function(k) {
+    ddd <- lapply(dd, function(k) {
       d1 <-
         with(k, distGeo(cbind(lon, lat)[1, ], cbind(lon, lat)[2, ], a = 6378.137))
       d2 <-
@@ -57,5 +61,5 @@ strip <-
         k$filt[nrow(k)] <- FALSE
       k
     })
-  y
+  ddd
   }

@@ -1,25 +1,25 @@
-#' strip out extreme outlier locations from Argos data
-#' 
-#' Use \code{diveMove::grpSpeedFilter} & \code{geosphere::distGeo} to identify extreme 
-#' outlier locations prior to \code{feed}-ing to \code{ssmTMB::fit_ssm}. Outliers are not 
-#' removed but flagged with a logical vector so they can be ignored when \code{feed}-ing 
-#' to \code{ssmTMB::fit_ssm}. \code{geosphere::distGeo} is only used for the first and
-#' last locations, which aren't handled by \code{diveMove::grpSpeedFilter}.
-#' 
-#' @param dat A data_frame containing the following columns: 
+#' Strip Argos track data of unwanted records
+#'
+#' Strip does the following:  1) removes duplicated date records; 2) removes start locations in
+#' N Hemisphere, eg. Seattle, BAS, SMRU (will be generalised later); 3) removes deployments with
+#' less than min.obs records; 4) removes deployments that last less than min.days; 5) removes
+#' records with NA lat and/or lon; 6) shifts 0, 360 longitudes to -180, 180. Each of these steps
+#' can be optionally turned off.
+#'
+#' @param dat A data_frame containing the following columns:
 #' "id", "date", "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
 #' "date" is the GMT date-time of each observation with the following format
 #' "2001-11-13 07:59:59". "lc" is the Argos location quality class of each
 #' observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
 #' "2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
-#' observed latitude in decimal degress. 
-#' 
-#' @return A list is returned with each outer list element corresponding to each unique 
+#' observed latitude in decimal degress.
+#'
+#' @return A list is returned with each outer list element corresponding to each unique
 #' individual id in the input data. The output data_frames include an additional column, labelled
 #' "filt" which is a logical vector indicating whether location is to be used in subsequent steps
-#' 
+#'
 #' @author Ian Jonsen
-#' 
+#'
 #' @examples
 #' \dontrun{
 #' }
@@ -27,38 +27,45 @@
 #' @importFrom diveMove grpSpeedFilter
 #' @importFrom geosphere distGeo
 #' @importFrom pbapply pblapply
-#' @export 
-strip <-
-  function(dat,
-           min.obs = 20,
-           min.days = 1,
-           vmax = 10,
-           dmax = 500
-           ) {
-    
-    d <- split(dat, dat$id)
-    
-    ## flag extreme travel rate locations for removal at ssm filter stage
-    options("pbapply" = "txt")
-    dd <- pblapply(d, function(k) {
-      k$filt <-
-        try(with(k, grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax)), silent =
-              TRUE)
-      k
-    })
-    
-    ## speed filter doesn't flag first or last locations so use a distance threshold of dmax km
-    ddd <- lapply(dd, function(k) {
-      d1 <-
-        with(k, distGeo(cbind(lon, lat)[1, ], cbind(lon, lat)[2, ], a = 6378.137))
-      d2 <-
-        with(k, distGeo(cbind(lon, lat)[nrow(k) - 1, ], cbind(lon, lat)[nrow(k), ], a =
-                          6378.137))
-      if (d1 > dmax)
-        k$filt[1] <- FALSE
-      if (d2 > dmax)
-        k$filt[nrow(k)] <- FALSE
-      k
-    })
-  ddd
-  }
+#' @export
+
+strip <- function(dat,
+                  what = rep(1, 6)
+                  ) {
+  
+  ## order records by date/time & remove duplicated date/time entries within each individual dataset
+  x1 <- lapply(x, function(z) {
+    z1 = z[order(z$date),]
+    z1[!duplicated(z1$date),]
+  })
+  
+  ## remove start locations in N hemisphere (e.g., Seattle, BAS, SMRU)
+  x2 <- lapply(x1, function(k) {
+    subset(k, lat < 10)
+  })
+  
+  ## remove deployments with less than min.obs (originally set to < 40)
+  deplen.log <- sapply(x2, nrow) < min.obs
+  x3 <- x2[!deplen.log]
+  
+  ## remove deployments that last less than min.days days (originally set to < 10)
+  depdur.log <-
+    sapply(x3, function(k)
+      difftime(max(k$date), min(k$date), unit = "days") < min.days)
+  x4 <- x3[!depdur.log]
+  
+  ## remove Z-class locations
+  x5 <- lapply(x4, function(k)
+    subset(k, lc != "Z"))
+  
+  ## remove records with NA lat and/or lon
+  x6 <- lapply(x5, function(k)
+    subset(k, !is.na(lat) & !is.na(lon)))
+  
+  ## shift 0,360 longitudes to -180,180
+  x7 <- lapply(x6, function(k) {
+    k$lon <- with(k, ifelse(lon > 180, lon - 360, lon))
+    k
+  })
+  
+}

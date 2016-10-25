@@ -2,7 +2,7 @@
 % Please edit documentation in R/feed.r
 \name{feed}
 \alias{feed}
-\title{Wrapper function to fit DCRW via \code{ssmTMB::fit_ssm}}
+\title{Feed Argos track(s) to ssmTMB}
 \usage{
 feed(dat, dlen = NULL, ts = 2, pass2 = FALSE, plot = FALSE,
   out = NULL, ...)
@@ -44,7 +44,8 @@ samples. For the hDCRW and hDCRWS models, a list is returned where results, etc 
 combined amongst the individuals
 }
 \description{
-Wrapper function to fit DCRW via \code{ssmTMB::fit_ssm}
+This is a wrapper function that feeds single or multiple Argos datasets for filtering via
+\code{ssmTMB::fit_ssm}
 }
 \examples{
 \dontrun{

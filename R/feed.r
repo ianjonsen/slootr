@@ -1,4 +1,7 @@
-#' Wrapper function that feeds multiple track datasets to \code{ssmTMB::fit_ssm}
+#' Feed Argos track(s) to ssmTMB
+#' 
+#' This is a wrapper function that feeds single or multiple Argos datasets for filtering via
+#' \code{ssmTMB::fit_ssm}
 #' 
 #' @param dat A data frame containing the following columns, "id","date",
 #' "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.

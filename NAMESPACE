@@ -3,6 +3,7 @@
 export(clean)
 export(feed)
 export(strip)
+export(trim)
 importFrom(diveMove,grpSpeedFilter)
 importFrom(geosphere,distGeo)
 importFrom(pbapply,pblapply)

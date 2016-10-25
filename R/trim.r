@@ -4,7 +4,6 @@
 #' 
 #' @param dat track data that has already been \code{strip}'ped
 #' 
-#' @return
 #' @author Ian Jonsen
 #' @examples
 #' \dontrun{

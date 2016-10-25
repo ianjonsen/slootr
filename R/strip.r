@@ -25,41 +25,58 @@
 #' @export
 
 strip <- function(dat,
-                  what = rep(1, 6),
+                  what = rep(TRUE, 6),
                   min.obs = 30,
                   min.days = 10
                   ) {
   
   x <- split(dat, dat$id)
   
-  ## remove duplicated date/time entries within each individual dataset
-  x1 <- lapply(x, function(k) {
-    k[!duplicated(k$date), ]
-  })
+  if (what[1]) {
+    ## remove duplicated date/time entries within each individual dataset
+    x <- lapply(x, function(k) {
+      k[!duplicated(k$date),]
+    })
+  }
   
-  ## remove start locations in N hemisphere (e.g., Seattle, BAS, SMRU)
-  x2 <- lapply(x1, function(k) {
-    subset(k, lat < 10)
-  })
+  if (what[2]) {
+    ## remove start locations in N hemisphere (e.g., Seattle, BAS, SMRU)
+    x <- lapply(x, function(k) {
+      subset(k, lat < 10)
+    })
+  }
   
-  ## remove deployments with less than min.obs records
-  deplen.log <- sapply(x2, nrow) < min.obs
-  x3 <- x2[!deplen.log]
+  if (what[3]) {
+    ## remove deployments with less than min.obs records
+    deplen.log <- sapply(x, nrow) < min.obs
+    x <- x[!deplen.log]
+    cat(sprintf("\n%d tracks with < min.obs records were removed\n\n", sum(deplen.log)))
+  }
   
-  ## remove deployments that last less than min.days days
-  depdur.log <-
-    sapply(x3, function(k)
-      difftime(max(k$date), min(k$date), unit = "days") < min.days)
-  x4 <- x3[!depdur.log]
+  if (what[4]) {
+    ## remove deployments that last less than min.days days
+    depdur.log <-
+      sapply(x, function(k)
+        difftime(max(k$date), min(k$date), unit = "days") < min.days)
+    x <- x[!depdur.log]
+    cat(sprintf("\n%d tracks lasting < min.days were removed\n\n", sum(depdur.log)))
+  }
   
-  ## remove records with NA lat and/or lon
-  x5 <- lapply(x4, function(k)
-    subset(k, !is.na(lat) & !is.na(lon)))
+  if (what[5]) {
+    ## remove records with NA lat and/or lon
+    x <- lapply(x, function(k)
+      subset(k, !is.na(lat) & !is.na(lon)))
+  }
   
-  ## shift 0,360 longitudes to -180,180
-  x6 <- lapply(x5, function(k) {
-    k$lon <- with(k, ifelse(lon > 180, lon - 360, lon))
-    k
-  })
+  if (what[6]) {
+    ## shift 0,360 longitudes to -180,180
+    x <- lapply(x, function(k) {
+      k$lon <- with(k, ifelse(lon > 180, lon - 360, lon))
+      k
+    })
+  }
   
+  cat(sprintf("\n%.2f tracks were removed due to insufficient data\n", 
+              sum(depdur.log) + sum(deplen.log)))
+ x 
 }

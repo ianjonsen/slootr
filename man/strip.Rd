@@ -4,7 +4,7 @@
 \alias{strip}
 \title{Strip Argos track data of unwanted records}
 \usage{
-strip(dat, what = rep(1, 6), min.obs = 30, min.days = 10)
+strip(dat, what = rep(TRUE, 6), min.obs = 30, min.days = 10)
 }
 \arguments{
 \item{dat}{A data.frame containing the following columns:

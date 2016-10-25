@@ -1,5 +1,5 @@
 Package: slootr
-Title: R tools for manipulating Argos tracking data
+Title: Tools for manipulating Argos tracking data
 Version: 0.0.1.9000
 Authors@R: c(
     person("Ian", "Jonsen", email = "ian.jonsen@mq.edu.au", role = c("aut", "cre"))

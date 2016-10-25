@@ -4,7 +4,9 @@ Version: 0.0.1.9000
 Authors@R: c(
     person("Ian", "Jonsen", email = "ian.jonsen@mq.edu.au", role = c("aut", "cre"))
     )
-Description: Pre-filters, organises and feeds Argos satellite tracking data to ssmTMB::fit_ssm
+Description: Strip Argos tracking data of duplicated records, missing observations, and uninformative deployments; 
+Trim the deployment start and end periods of spurious records; Clean the remaining data into termporal 
+order and identify extreme outlier observations; Feed data to the state-space filter ssmTMB::fit_ssm.
 Depends:
     R (>= 3.3.0),
     ssmTMB

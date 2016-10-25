@@ -1,57 +1,61 @@
-fitSSM = function(dat,
+#' Wrapper function to fit DCRW via \code{ssmTMB::fit_ssm}
+#' 
+#' @param dat A data frame containing the following columns, "id","date",
+#' "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
+#' "date" is the GMT date-time of each observation with the following format
+#' "2001-11-13 07:59:59". "lc" is the Argos location quality class of each
+#' observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
+#' "2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
+#' observed latitude in decimal degress. The Z-class locations are assumed to 
+#' have the same error distributions as B-class locations.
+#' @param dlen index to trim input data down to dlen tracks for testing
+#' @param ts time step in h
+#' @param out name of output object. If not provided then the name of the input data object with
+##          "_ssm" appended will be used
+#' @param pass2 logical, try a second optimisation using optim (much slower than nlminb)
+#' @param plot logical, generate plot of fits to data. File name is generated from name of
+##          the input data object and appended with "_ssm.pdf"
+#' @param span parameter that controls the degree of smoothing by \code{stats::loess},
+#' used to obtain initial values for the location states. Smaller values = less
+#' smoothing. Values > 0.3 may be required for sparse datasets
+#' @param ... other arguments to \code{ssmTMB::fit_ssm}
+#' 
+#' @return For DCRW and DCRWS models, a list is returned with each outer list
+#' elements corresponding to each unique individual id in the input data
+#' Within these outer elements are a "summary" data.frame of posterior mean and
+#' median state estimates (locations or locations and behavioural states), the
+#' name of the "model" fit, the "timestep" used, the input location "data", the
+#' number of location state estimates ("N"), and the full set of "mcmc"
+#' samples. For the hDCRW and hDCRWS models, a list is returned where results, etc are
+#' combined amongst the individuals
+#' @author Ian Jonsen
+#' 
+#' @examples
+#' \dontrun{
+#' }
+#' @importFrom tibble data_frame as_data_frame
+#' @importFrom ssmTMB fit_ssm
+#' @importFrom pbapply pblapply
+#' @export 
+
+feed <- function(dat,
                   dlen = NULL,
-                  ts = list(gps = 1, gls = 12, ptt = 2),
+                  ts = 2,
                   pass2 = FALSE,
-                  plot = TRUE,
+                  plot = FALSE,
                   out = NULL,
-                  ...) {
-  ## wrapper function for calling dcrw() from Bremerhaven package
-  ##
-  ## dat - input cleaned data as a list of individual track data.frames in the expected format
-  ## dlen - used to trim input data for testing
-  ## ts - specify a list of time steps (in h) for gps, gls, & ptt datasets
-  ## pass2 - try a second optimisation using optim for pass1 crashes & convergence failures
-  ## plot - TRUE if .pdf of fit plots is to be generated. File name is generated from name of
-  ##          the input data object and appended with "_ssm.pdf"
-  ## out - name of output object. If not provided then the name of the input data object with
-  ##          ".ssm" appended will be used
-  ## ... - additional arguments passed to dcrw
+                  ...
+                ) {
   
-  require(Bremerhaven, quiet = TRUE)
-  require(pbapply, quiet = TRUE)
   options("pbapply" = "txt", warn = -1)
   
   if (is.null(dlen))
-    dlen = 1:length(dat$pfdat)
+    dlen = 1:length(dat)
   
   cat("Starting optimisation using nlminb...\n")
   etime <- system.time(ssm <- pblapply(dlen, function(i) {
-    d <- dat$pfdat[[i]]
-    switch(
-      unique(d$device_type),
-      GPS = {
-        if (is.null(dat$ts))
-          ts = ts$gps
-        else{
-          ts = dat$ts[i]
-        }
-      },
-      GLS = {
-        if (is.null(dat$ts))
-          ts = ts$gls
-        else {
-          ts = dat$ts[i]
-        }
-      },
-      PTT = {
-        if (is.null(dat$ts))
-          ts = ts$ptt
-        else {
-          ts = dat$ts[i]
-        }
-      }
-    )
-    try(dcrw(d, subset = d$filt, tstep = ts / 24, ...), silent = TRUE)
+    d <- dat[[i]]
+    try(fit_ssm(d, subset = d$filt, tstep = ts / 24, ...), silent = TRUE)
   }))
   cat(sprintf("\nTotal Elapsed time: %.2f min\n\n", etime[3] / 60))
   

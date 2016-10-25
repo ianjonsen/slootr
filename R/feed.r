@@ -23,14 +23,8 @@
 #' smoothing. Values > 0.3 may be required for sparse datasets
 #' @param ... other arguments to \code{ssmTMB::fit_ssm}
 #' 
-#' @return For DCRW and DCRWS models, a list is returned with each outer list
-#' elements corresponding to each unique individual id in the input data
-#' Within these outer elements are a "summary" data.frame of posterior mean and
-#' median state estimates (locations or locations and behavioural states), the
-#' name of the "model" fit, the "timestep" used, the input location "data", the
-#' number of location state estimates ("N"), and the full set of "mcmc"
-#' samples. For the hDCRW and hDCRWS models, a list is returned where results, etc are
-#' combined amongst the individuals
+#' @return A list is returned with each outer list elements corresponding to each unique 
+#' individual id in the input data. 
 #' @author Ian Jonsen
 #' 
 #' @examples
@@ -58,46 +52,26 @@ feed <- function(dat,
   cat("Starting optimisation using nlminb...\n")
   etime <- system.time(ssm <- pblapply(dlen, function(i) {
     d <- dat[[i]]
-    try(fit_ssm(d, subset = d$filt, tstep = ts / 24, ...), silent = TRUE)
+    try(fit_ssm(d, 
+                subset = d$filt, 
+                tstep = ts / 24, 
+                ...), 
+        silent = TRUE)
   }))
   cat(sprintf("\nTotal Elapsed time: %.2f min\n\n", etime[3] / 60))
   
+  ## try second pass optimisation on any failed or false convergence results
   if (pass2) {
-    ## try second pass optimisation on any failed or false convergence results
     fc = which(sapply(ssm, function(x)
       length(x) == 1 || x$opt$conv != 0))
     cat(sprintf("%d tracks failed to converge\n", length(fc)))
     cat("Starting 2nd pass optimisation using optim...\n")
     etime <- system.time(foo <- pblapply(fc, function(i) {
-      d <- dat$pfdat[[i]]
-      switch(
-        unique(d$device_type),
-        GPS = {
-          if (is.null(dat$ts))
-            ts = ts$gps
-          else{
-            ts = dat$ts[i]
-          }
-        },
-        GLS = {
-          if (is.null(dat$ts))
-            ts = ts$gls
-          else {
-            ts = dat$ts[i]
-          }
-        },
-        PTT = {
-          if (is.null(dat$ts))
-            ts = ts$ptt
-          else {
-            ts = dat$ts[i]
-          }
-        }
-      )
-      try(dcrw(d,
-               subset = d$filt,
-               tstep = ts / 24,
-               optim = "optim"),
+      d <- dat[[i]]
+      try(fit_ssm(d, 
+                  subset = d$filt, 
+                  tstep = ts / 24, 
+                  optim = "optim"), 
           silent = TRUE)
     }))
     cat(sprintf("\nTotal Elapsed time (2nd pass): %.2f min\n", etime[3] /
@@ -108,17 +82,17 @@ feed <- function(dat,
   
   if (is.null(out))
     out <- deparse(substitute(dat))
-  assign(paste(out, ".ssm", sep = ""),
+  assign(paste(out, "_ssm", sep = ""),
          ssm,
          pos = 1,
          immediate = TRUE)
   
   if (plot)
-    plotSSM(ssm, dat, out, dlen)
+    plot_ssm(ssm, dat, out, dlen)
   
 }
 
-plotSSM <- function(ssm,
+plot_ssm <- function(ssm,
                     dat = NULL,
                     sp,
                     dlen = NULL,

@@ -34,14 +34,8 @@ used to obtain initial values for the location states. Smaller values = less
 smoothing. Values > 0.3 may be required for sparse datasets}
 }
 \value{
-For DCRW and DCRWS models, a list is returned with each outer list
-elements corresponding to each unique individual id in the input data
-Within these outer elements are a "summary" data.frame of posterior mean and
-median state estimates (locations or locations and behavioural states), the
-name of the "model" fit, the "timestep" used, the input location "data", the
-number of location state estimates ("N"), and the full set of "mcmc"
-samples. For the hDCRW and hDCRWS models, a list is returned where results, etc are
-combined amongst the individuals
+A list is returned with each outer list elements corresponding to each unique 
+individual id in the input data.
 }
 \description{
 This is a wrapper function that feeds single or multiple Argos datasets for filtering via

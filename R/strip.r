@@ -24,7 +24,6 @@
 #' \dontrun{
 #' }
 #' @importFrom ssmTMB fit_ssm
-#' @importFrom tibble data_frame as_data_frame
 #' @importFrom diveMove grpSpeedFilter
 #' @importFrom geosphere distGeo
 #' @importFrom pbapply pblapply

@@ -1,4 +1,4 @@
-#' Wrapper function to fit DCRW via \code{ssmTMB::fit_ssm}
+#' Wrapper function that feeds multiple track datasets to \code{ssmTMB::fit_ssm}
 #' 
 #' @param dat A data frame containing the following columns, "id","date",
 #' "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.

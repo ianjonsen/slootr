@@ -4,8 +4,7 @@
 \alias{feed}
 \title{Feed Argos track(s) to ssmTMB}
 \usage{
-feed(dat, dlen = NULL, ts = 2, pass2 = FALSE, plot = FALSE,
-  out = NULL, ...)
+feed(dat, dlen = NULL, ts = 2, pass2 = FALSE, plot = FALSE, ...)
 }
 \arguments{
 \item{dat}{A data frame containing the following columns, "id","date",
@@ -24,8 +23,6 @@ have the same error distributions as B-class locations.}
 \item{pass2}{logical, try a second optimisation using optim (much slower than nlminb)}
 
 \item{plot}{logical, generate plot of fits to data. File name is generated from name of}
-
-\item{out}{name of output object. If not provided then the name of the input data object with}
 
 \item{...}{other arguments to \code{ssmTMB::fit_ssm}}
 

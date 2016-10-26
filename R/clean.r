@@ -30,35 +30,33 @@
 #' @export 
 clean <-
   function(dat,
-           min.obs = 20,
-           min.days = 1,
            vmax = 10,
            dmax = 500
            ) {
-    
-    d <- split(dat, dat$id)
-    
+
     ## flag extreme travel rate locations for removal at ssm filter stage
     options("pbapply" = "txt")
-    dd <- pblapply(d, function(k) {
-      k$filt <-
-        try(with(k, grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax)), silent =
+    d <- pblapply(dat, function(k) {
+      k$keep[k$keep] <-
+        try(with(subset(k, keep), grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax)), silent =
               TRUE)
       k
     })
     
     ## speed filter doesn't flag first or last locations so use a distance threshold of dmax km
-    ddd <- lapply(dd, function(k) {
+    dd <- lapply(d, function(k) {
       d1 <-
-        with(k, distGeo(cbind(lon, lat)[1, ], cbind(lon, lat)[2, ], a = 6378.137))
-      d2 <-
-        with(k, distGeo(cbind(lon, lat)[nrow(k) - 1, ], cbind(lon, lat)[nrow(k), ], a =
-                          6378.137))
+        with(subset(k, keep), distGeo(cbind(lon, lat)[1, ], cbind(lon, lat)[2, ], a = 6378.137))
+      
+      ll <- with(subset(k, keep), cbind(lon, lat))
+      d2 <- distGeo(ll[nrow(ll) - 1, ], ll[nrow(ll), ], a = 6378.137)
+        
       if (d1 > dmax)
-        k$filt[1] <- FALSE
+        k$keep[k$keep][1] <- FALSE
       if (d2 > dmax)
-        k$filt[nrow(k)] <- FALSE
+        k$keep[k$keep][nrow(k)] <- FALSE
+      
       k
     })
-  ddd
+  dd
   }

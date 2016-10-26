@@ -4,7 +4,7 @@
 \alias{clean}
 \title{Cleans extreme outlier locations in Argos data}
 \usage{
-clean(dat, min.obs = 20, min.days = 1, vmax = 10, dmax = 500)
+clean(dat, vmax = 10, dmax = 500)
 }
 \arguments{
 \item{dat}{A data_frame containing the following columns: 

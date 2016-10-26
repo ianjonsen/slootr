@@ -13,8 +13,6 @@
 #' have the same error distributions as B-class locations.
 #' @param dlen index to trim input data down to dlen tracks for testing
 #' @param ts time step in h
-#' @param out name of output object. If not provided then the name of the input data object with
-##          "_ssm" appended will be used
 #' @param pass2 logical, try a second optimisation using optim (much slower than nlminb)
 #' @param plot logical, generate plot of fits to data. File name is generated from name of
 ##          the input data object and appended with "_ssm.pdf"
@@ -39,7 +37,6 @@ feed <- function(dat,
                   ts = 2,
                   pass2 = FALSE,
                   plot = FALSE,
-                  out = NULL,
                   ...
                 ) {
   
@@ -52,7 +49,7 @@ feed <- function(dat,
   etime <- system.time(ssm <- pblapply(dlen, function(i) {
     d <- dat[[i]]
     try(fit_ssm(d, 
-                subset = d$filt, 
+                subset = d$keep, 
                 tstep = ts / 24, 
                 ...), 
         silent = TRUE)
@@ -61,16 +58,17 @@ feed <- function(dat,
   
   ## try second pass optimisation on any failed or false convergence results
   if (pass2) {
-    fc = which(sapply(ssm, function(x)
+    fc <- which(sapply(ssm, function(x)
       length(x) == 1 || x$opt$conv != 0))
     cat(sprintf("%d tracks failed to converge\n", length(fc)))
     cat("Starting 2nd pass optimisation using optim...\n")
     etime <- system.time(foo <- pblapply(fc, function(i) {
       d <- dat[[i]]
       try(fit_ssm(d, 
-                  subset = d$filt, 
+                  subset = d$keep, 
                   tstep = ts / 24, 
-                  optim = "optim"), 
+                  optim = "optim", 
+                  ...), 
           silent = TRUE)
     }))
     cat(sprintf("\nTotal Elapsed time (2nd pass): %.2f min\n", etime[3] /
@@ -79,15 +77,9 @@ feed <- function(dat,
   }
   options(warn = 0)
   
-  if (is.null(out))
-    out <- deparse(substitute(dat))
-  assign(paste(out, "_ssm", sep = ""),
-         ssm,
-         pos = 1,
-         immediate = TRUE)
-  
   if (plot)
-    plot_fit(ssm, dat, out, dlen)
+    plot_fit(ssm, dat, deparse(substitute(dat)), dlen)
   
+  ssm
 }
 

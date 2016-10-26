@@ -1,3 +1,16 @@
+#' Visual an SSM fit to data as a map and as 1-d time-series
+#'
+#'
+#'
+#' 
+#'  
+#' @importFrom ggplot2 ggplot geom_point geom_map theme geom_path ggtitle 
+#' @importFrom ggplot2 geom_line geom_rug ylim xlim coord_fixed
+#' @importFrom gridExtra grid.arrange
+#' @importFrom mapdata map_data
+#' @importFrom pbapply pblapply
+#' @export
+
 plot_fit <- function(ssm,
                      dat = NULL,
                      sp,
@@ -5,11 +18,7 @@ plot_fit <- function(ssm,
                      res = "high") {
   
   ## generate a .pdf of SSM fits to data
-  require(Bremerhaven, quiet = TRUE)
-  require(ggplot2, quietly = TRUE)
-  require(gridExtra, quietly = TRUE)
-  require(pbapply, quietly = TRUE)
-  require(mapdata, quietly = TRUE)
+
   options("pbapply" = "txt")
   switch(res,
          low = {

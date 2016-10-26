@@ -3,8 +3,8 @@
 #' Strip does the following:  1) removes duplicated date records; 2) removes start locations in
 #' N Hemisphere, eg. Seattle, BAS, SMRU (will be generalised later); 3) removes deployments with
 #' less than min.obs records; 4) removes deployments that last less than min.days; 5) removes
-#' records with NA lat and/or lon; 6) shifts 0, 360 longitudes to -180, 180. Each of these steps
-#' can be optionally turned off.
+#' records with NA lat and/or lon; 6) removes Z-class locations; 7) shifts 0, 360 longitudes to -180, 180. 
+#' Each of these steps can be optionally turned off.
 #'
 #' @param dat A data.frame containing the following columns:
 #' "id", "date", "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
@@ -25,7 +25,7 @@
 #' @export
 
 strip <- function(dat,
-                  what = rep(TRUE, 6),
+                  what = rep(TRUE, 7),
                   min.obs = 30,
                   min.days = 10
                   ) {
@@ -69,6 +69,13 @@ strip <- function(dat,
   }
   
   if (what[6]) {
+    ## remove records with NA lat and/or lon
+    x <- lapply(x, function(k) {
+      subset(k, lc != "Z")
+      })
+  }
+  
+  if (what[7]) {
     ## shift 0,360 longitudes to -180,180
     x <- lapply(x, function(k) {
       k$lon <- with(k, ifelse(lon > 180, lon - 360, lon))

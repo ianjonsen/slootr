@@ -4,7 +4,7 @@
 \alias{strip}
 \title{Strip Argos track data of unwanted records}
 \usage{
-strip(dat, what = rep(TRUE, 6), min.obs = 30, min.days = 10)
+strip(dat, what = rep(TRUE, 7), min.obs = 30, min.days = 10)
 }
 \arguments{
 \item{dat}{A data.frame containing the following columns:
@@ -23,8 +23,8 @@ individual id in the input data.
 Strip does the following:  1) removes duplicated date records; 2) removes start locations in
 N Hemisphere, eg. Seattle, BAS, SMRU (will be generalised later); 3) removes deployments with
 less than min.obs records; 4) removes deployments that last less than min.days; 5) removes
-records with NA lat and/or lon; 6) shifts 0, 360 longitudes to -180, 180. Each of these steps
-can be optionally turned off.
+records with NA lat and/or lon; 6) removes Z-class locations; 7) shifts 0, 360 longitudes to -180, 180. 
+Each of these steps can be optionally turned off.
 }
 \examples{
 \dontrun{

@@ -66,7 +66,7 @@ strip <- function(d,
   
   cat(sprintf("%d tracks input\n", r_st))
   cat(sprintf("%d tracks with < min_obs records removed\n", r_st - r_obs))
-  cat(sprintf("%d tracks lasting < min_days removed\n", r_days - r_obs))
+  cat(sprintf("%d tracks lasting < min_days removed\n", r_obs - r_days))
   cat(sprintf("%d tracks retained\n\n", r_days))
    
  x6 

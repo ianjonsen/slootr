@@ -2,12 +2,16 @@
 % Please edit documentation in R/trim.r
 \name{trim}
 \alias{trim}
-\title{Trims deployment start and end periods of spurious data}
+\title{Trims deployment start and end periods of spurious data by
+  specifying a buffer distance around a deployment location}
 \usage{
-trim(dat)
+trim(d, b = 4000)
 }
 \arguments{
-\item{dat}{track data that has already been \code{strip}'ped}
+\item{d}{track data that has already been \code{strip}'ped}
+
+\item{buffer}{distance in m from deployment location (defaults to first recorded 
+location) within which observed locations are to be trimmed}
 }
 \description{
 Use graphical interface to identify proper start and end of animal tracks

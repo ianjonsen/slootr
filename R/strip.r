@@ -64,9 +64,10 @@ strip <- function(d,
   r_obs <- summarise(x3) %>% dim() %>% .[1]
   r_days <- summarise(x4) %>% dim() %>% .[1]
   
-  cat(sprintf("%d tracks with < min_obs records were removed\n", r_st - r_obs))
-  cat(sprintf("%d tracks lasting < min_days were removed\n", r_st - r_days))
-  cat(sprintf("%d tracks were retained\n\n", r_st - (r_st - r_obs + r_st - r_days)))
+  cat(sprintf("%d tracks input\n", r_st))
+  cat(sprintf("%d tracks with < min_obs records removed\n", r_st - r_obs))
+  cat(sprintf("%d tracks lasting < min_days removed\n", r_st - r_days))
+  cat(sprintf("%d tracks retained\n\n", r_st - (r_st - r_obs + r_st - r_days)))
    
  x6 
 }

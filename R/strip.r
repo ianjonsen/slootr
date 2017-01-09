@@ -17,6 +17,7 @@
 #' steps.
 #' @param min_obs The minimum number of observations an individual track requires to be retained.
 #' @param min_days The minimum number of deployment days an individual tracks requires to be retained. 
+#' @param na_value Define NA in input data if a numeric (eg. 999) is used.
 #'
 #' @return A tbl_df grouped by individual id is returned. 
 #'
@@ -35,6 +36,17 @@ strip <- function(d,
                   ) {
 
   if(class(d)[1] != "tbl_df") d <- tbl_df(d)
+  if(min(d$lon) < -180 || max(d$lon) > 360) {
+    ids <- d %>% filter(lon > 360 | lon < -180) %>% .$id
+    print(table(ids))
+    stop("\nLongitude range extends beyond plausible values, -180, 360 in the above individuals\n")
+  }
+  if(min(d$lat) < -90 || max(d$lat) > 90) {
+    ids <- d %>% filter(lat > 90 | lat < -90) %>% .$id
+    print(table(ids))
+    stop("\nLatitude range extends beyond plausible values, -90, 90 in the above individuals\n")
+  }
+  
   
   x <- d %>% group_by(id)
   

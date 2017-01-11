@@ -21,6 +21,8 @@ steps.}
 \item{min_obs}{The minimum number of observations an individual track requires to be retained.}
 
 \item{min_days}{The minimum number of deployment days an individual tracks requires to be retained.}
+
+\item{na_value}{Define NA in input data if a numeric (eg. 999) is used.}
 }
 \value{
 A tbl_df grouped by individual id is returned.

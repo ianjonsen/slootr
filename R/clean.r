@@ -1,13 +1,11 @@
 #' Cleans extreme outlier locations in Argos data
 #' 
-#' Use \code{diveMove::grpSpeedFilter} & \code{geosphere::distGeo} to identify extreme 
+#' Use \code{diveMove::grpSpeedFilter} to identify extreme 
 #' outlier locations prior to \code{feed}-ing to \code{ssmTMB::fit_ssm}. Outliers are not 
 #' removed but flagged with a logical vector so they can be ignored when \code{feed}-ing 
-#' to \code{ssmTMB::fit_ssm}. \code{geosphere::distGeo} is only used for the first and
-#' last locations, which aren't handled by \code{diveMove::grpSpeedFilter}. \code{clean} 
-#' also ensures data are temporally ordered.
+#' to \code{ssmTMB::fit_ssm}. \code{clean} also ensures data are temporally ordered.
 #' 
-#' @param dat A data_frame containing the following columns: 
+#' @param d A data_frame containing the following columns: 
 #' "id", "date", "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
 #' "date" is the GMT date-time of each observation with the following format
 #' "2001-11-13 07:59:59". "lc" is the Argos location quality class of each
@@ -25,38 +23,18 @@
 #' \dontrun{
 #' }
 #' @importFrom diveMove grpSpeedFilter
-#' @importFrom geosphere distGeo
-#' @importFrom pbapply pblapply
+#' @importFrom dplyr %>% tbl_df group_by do mutate arrange
 #' @export 
 clean <-
-  function(dat,
+  function(d,
            vmax = 10,
-           dmax = 500
+           w = 5
            ) {
 
-    ## flag extreme travel rate locations for removal at ssm filter stage
-    options("pbapply" = "txt")
-    d <- pblapply(dat, function(k) {
-      k$keep[k$keep] <-
-        try(with(subset(k, keep), grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax)), silent =
-              TRUE)
-      k
-    })
+    if (class(d)[1] != "grouped_df") d <- tbl_df(d) %>% grouped_by(id)
     
-    ## speed filter doesn't flag first or last locations so use a distance threshold of dmax km
-    dd <- lapply(d, function(k) {
-      d1 <-
-        with(subset(k, keep), distGeo(cbind(lon, lat)[1, ], cbind(lon, lat)[2, ], a = 6378.137))
-      
-      ll <- with(subset(k, keep), cbind(lon, lat))
-      d2 <- distGeo(ll[nrow(ll) - 1, ], ll[nrow(ll), ], a = 6378.137)
-        
-      if (d1 > dmax)
-        k$keep[k$keep][1] <- FALSE
-      if (d2 > dmax)
-        k$keep[k$keep][nrow(k)] <- FALSE
-      
-      k
-    })
-  dd
+    ## flag extreme travel rate locations for removal at ssm filter stage
+    y <- d %>% do(., mutate(., keep = grpSpeedFilter(cbind(date, lon, lat), speed.thr = vmax, window = w))) %>%
+      do(., arrange(., date))
+    
   }

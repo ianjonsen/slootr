@@ -4,18 +4,9 @@
 \alias{feed}
 \title{Feed Argos track(s) to ssmTMB}
 \usage{
-feed(dat, dlen = NULL, ts = 2, pass2 = FALSE, plot = FALSE, ...)
+feed(d, dlen = NULL, ts = 2, pass2 = FALSE, plot = FALSE, ...)
 }
 \arguments{
-\item{dat}{A data frame containing the following columns, "id","date",
-"lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
-"date" is the GMT date-time of each observation with the following format
-"2001-11-13 07:59:59". "lc" is the Argos location quality class of each
-observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
-"2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
-observed latitude in decimal degress. The Z-class locations are assumed to 
-have the same error distributions as B-class locations.}
-
 \item{dlen}{index to trim input data down to dlen tracks for testing}
 
 \item{ts}{time step in h}
@@ -25,6 +16,15 @@ have the same error distributions as B-class locations.}
 \item{plot}{logical, generate plot of fits to data. File name is generated from name of}
 
 \item{...}{other arguments to \code{ssmTMB::fit_ssm}}
+
+\item{dat}{A data frame containing the following columns, "id","date",
+"lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
+"date" is the GMT date-time of each observation with the following format
+"2001-11-13 07:59:59". "lc" is the Argos location quality class of each
+observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
+"2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
+observed latitude in decimal degress. The Z-class locations are assumed to 
+have the same error distributions as B-class locations.}
 
 \item{span}{parameter that controls the degree of smoothing by \code{stats::loess},
 used to obtain initial values for the location states. Smaller values = less

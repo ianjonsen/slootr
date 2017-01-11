@@ -32,7 +32,7 @@
 #' @importFrom pbapply pblapply
 #' @export 
 
-feed <- function(dat,
+feed <- function(d,
                   dlen = NULL,
                   ts = 2,
                   pass2 = FALSE,
@@ -43,13 +43,13 @@ feed <- function(dat,
   options("pbapply" = "txt", warn = -1)
   
   if (is.null(dlen))
-    dlen = 1:length(dat)
+    dlen = 1:length(d)
   
-  cat("Starting optimisation using nlminb...\n")
+  cat("\nStarting optimisation using nlminb...\n")
   etime <- system.time(ssm <- pblapply(dlen, function(i) {
-    d <- dat[[i]]
-    try(fit_ssm(d, 
-                subset = d$keep, 
+    x <- d[[i]]
+    try(fit_ssm(x, 
+                subset = x$keep, 
                 tstep = ts / 24, 
                 ...), 
         silent = TRUE)
@@ -63,9 +63,9 @@ feed <- function(dat,
     cat(sprintf("%d tracks failed to converge\n", length(fc)))
     cat("Starting 2nd pass optimisation using optim...\n")
     etime <- system.time(foo <- pblapply(fc, function(i) {
-      d <- dat[[i]]
-      try(fit_ssm(d, 
-                  subset = d$keep, 
+      x <- d[[i]]
+      try(fit_ssm(x, 
+                  subset = x$keep, 
                   tstep = ts / 24, 
                   optim = "optim", 
                   ...), 
@@ -78,7 +78,7 @@ feed <- function(dat,
   options(warn = 0)
   
   if (plot)
-    plot_fit(ssm, dat, deparse(substitute(dat)), dlen)
+    plot_fit(ssm, d, deparse(substitute(d)), dlen)
   
   ssm
 }

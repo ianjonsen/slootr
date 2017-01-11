@@ -36,6 +36,7 @@ strip <- function(d,
                   ) {
 
   if(class(d)[1] != "tbl_df") d <- tbl_df(d)
+  
   if(min(d$lon) < -180 || max(d$lon) > 360) {
     ids <- d %>% filter(lon > 360 | lon < -180) %>% .$id
     print(table(ids))

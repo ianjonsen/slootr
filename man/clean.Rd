@@ -4,10 +4,10 @@
 \alias{clean}
 \title{Cleans extreme outlier locations in Argos data}
 \usage{
-clean(dat, vmax = 10, dmax = 500)
+clean(d, vmax = 10, w = 5)
 }
 \arguments{
-\item{dat}{A data_frame containing the following columns: 
+\item{d}{A data_frame containing the following columns: 
 "id", "date", "lc", "lon", "lat". "id" is a unique identifier for the tracking dataset.
 "date" is the GMT date-time of each observation with the following format
 "2001-11-13 07:59:59". "lc" is the Argos location quality class of each
@@ -21,12 +21,10 @@ individual id in the input data. The output data_frames include an additional co
 "filt" which is a logical vector indicating whether location is to be used in subsequent steps
 }
 \description{
-Use \code{diveMove::grpSpeedFilter} & \code{geosphere::distGeo} to identify extreme 
+Use \code{diveMove::grpSpeedFilter} to identify extreme 
 outlier locations prior to \code{feed}-ing to \code{ssmTMB::fit_ssm}. Outliers are not 
 removed but flagged with a logical vector so they can be ignored when \code{feed}-ing 
-to \code{ssmTMB::fit_ssm}. \code{geosphere::distGeo} is only used for the first and
-last locations, which aren't handled by \code{diveMove::grpSpeedFilter}. \code{clean} 
-also ensures data are temporally ordered.
+to \code{ssmTMB::fit_ssm}. \code{clean} also ensures data are temporally ordered.
 }
 \examples{
 \dontrun{

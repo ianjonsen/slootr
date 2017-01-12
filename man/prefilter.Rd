@@ -16,9 +16,7 @@ observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
 observed latitude in decimal degress.}
 }
 \value{
-A list is returned with each outer list element corresponding to each unique 
-individual id in the input data. The output data_frames include an additional column, labelled
-"filt" which is a logical vector indicating whether location is to be used in subsequent steps
+A tbl_df grouped by individual id is returned.
 }
 \description{
 Use \code{diveMove::grpSpeedFilter} to identify extreme 

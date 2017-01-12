@@ -14,8 +14,10 @@ trim(d, hang = 0.95, gap = 0.98)
 for potential discarding}
 
 \item{gap}{quantile of gap size (time difference) above which data beyond the hang-th
-quantile should be flagged for discard
-#'}
+quantile should be flagged for discard.}
+}
+\value{
+A tbl_df grouped by individual id is returned.
 }
 \description{
 Trims deployment start and end periods of spurious data via

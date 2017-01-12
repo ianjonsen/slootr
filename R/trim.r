@@ -3,9 +3,13 @@
 #'
 #'
 #' @param d track data that has already been \code{strip}'ped
-#' @param n window size to be used to obtain moving average of distance
-#' from deployment (first) location
-#'
+#' @param hang quantile of date range above which data gaps should be examined 
+#' for potential discarding
+#' @param gap quantile of gap size (time difference) above which data beyond the hang-th
+#' quantile should be flagged for discard.
+#' 
+#' @return A tbl_df grouped by individual id is returned.
+#' 
 #' @author Ian Jonsen
 #' @examples
 #' \dontrun{
@@ -14,18 +18,21 @@
 #' @importFrom geosphere distGeo
 #' @importFrom changepoint cpt.mean
 #' @export
-trim <- function(d, n = 11) {
-  if (!n %% 2)
-    stop("window size, n, must be an odd number")
+trim <- function(d, hang = 0.95, gap = 0.98) {
+
   if (class(d)[1] != "grouped_df")
     d <- tbl_df(d) %>% grouped_by(id)
   if ("keep" %in% names(d)) {
     d1 <- filter(d, keep)
   }
+  else {
+    d1 <- mutate(d, keep = TRUE)
+  }
   
   ## calculate moving average to smooth variability in distances from deployment location
   calc_dist <-
     function(x) {
+      n <- 11  ## ma window 
       d <- distGeo(c(x$lon[1], x$lat[1]), cbind(x$lon, x$lat)) / 1000
       d.ma <- stats::filter(d, rep(1 / n, n), sides = 2)
       ## set NA distances to first (or last) ma value
@@ -64,19 +71,29 @@ trim <- function(d, n = 11) {
     do(., mutate(., keep = ifelse(date >= start &
                                     date <= end, keep, FALSE)))
   
-  ## remove hanging locations after large data gaps at end of track
+  ## identify hanging locations after large data gaps at end of track
+  flag_all <- function(x) {
+    st <- which(!x$keep.end & x$keep)
+    if(length(st) > 0) {    
+    idx <- st[1]:nrow(x)
+    x$keep[idx] <- FALSE
+    }
+    x$keep
+  }
+  
   y <-
     y %>% do(., mutate(., ddiff = c(0, as.numeric(diff(
       date
     ))))) %>%
-    do(., mutate(., keep =
+    do(., mutate(., keep.end =
                    ifelse(
-                     date > quantile(date, 0.95) &
-                       ddiff > quantile(ddiff, 0.98),
+                     date > quantile(date, hang) &
+                       ddiff > quantile(ddiff, gap),
                      FALSE,
                      keep
-                   ))) 
-
+                   ))) %>%
+    do(., mutate(., keep = flag_all(.)))
+ 
   ##return original data_frame with keep flag updated
   d$keep[d$keep] <- y$keep
   

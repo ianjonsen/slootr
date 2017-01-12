@@ -5,13 +5,17 @@
 \title{Trims deployment start and end periods of spurious data via
    changepoint estimation}
 \usage{
-trim(d, n = 11)
+trim(d, hang = 0.95, gap = 0.98)
 }
 \arguments{
 \item{d}{track data that has already been \code{strip}'ped}
 
-\item{n}{window size to be used to obtain moving average of distance
-from deployment (first) location}
+\item{hang}{quantile of date range above which data gaps should be examined 
+for potential discarding}
+
+\item{gap}{quantile of gap size (time difference) above which data beyond the hang-th
+quantile should be flagged for discard
+#'}
 }
 \description{
 Trims deployment start and end periods of spurious data via

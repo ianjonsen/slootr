@@ -33,7 +33,7 @@ trim <- function(d, hang = 0.95, gap = 0.98) {
   calc_dist <-
     function(x) {
       n <- 11  ## ma window 
-      d <- distGeo(c(x$lon[1], x$lat[1]), cbind(x$lon, x$lat)) / 1000
+      d <- distGeo(c(x$lon[1], x$lat[1]), cbind(x$lon, x$lat), a = 6378.137)
       d.ma <- stats::filter(d, rep(1 / n, n), sides = 2)
       ## set NA distances to first (or last) ma value
       d.ma[1:(n %/% 2)]  <- d.ma[!is.na(d.ma)][1]
@@ -43,30 +43,39 @@ trim <- function(d, hang = 0.95, gap = 0.98) {
     }
   ## estimate start distance changepoint
   t_start <- function(x) {
-    cpt <- cpt.mean(log(x$dist[x$dist > 0]))@cpts[1]
+    cpt <- cpt.mean(log(x$dist[x$dist > 0]))@cpts
+    if(length(cpt) > 1) cpt <- cpt[1]
+    else if (length(cpt) == 1) {
+      cpt <- 1
+    }
     x$date[x$dist > 0][cpt]
   }
   ## estimate end distance changepoint
   t_end <- function(x) {
     cpt <- cpt.mean(log(x$dist[x$dist > 0]), method = "PELT")@cpts
+    
     if (length(cpt) == 2)
       cpt <- cpt[2]
     else if (length(cpt) > 2 &&
              x$date[x$dist == max(x$dist)] > x$date[cpt[length(cpt) - 1]]) {
       cpt <- cpt[length(cpt)]
     }
+    else if (length(cpt) == 1) {
+      cpt
+    }
     else {
       cpt <- cpt[length(cpt) - 1]
     }
+
     x$date[x$dist > 0][cpt]
   }
-  
+
   ## use changepoints to define track segment(s) to flag for discard
   y <- d1 %>% do(., mutate(., dist = calc_dist(.))) %>%
     do(., mutate(
       .,
       start = t_start(.),
-      end = ifelse(t_start(.) != t_end(.), t_end(.), max(date))
+      end = ifelse(start != t_end(.), t_end(.), max(date))
     )) %>%
     do(., mutate(., keep = ifelse(date >= start &
                                     date <= end, keep, FALSE)))

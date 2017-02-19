@@ -7,9 +7,8 @@
 #' @importFrom tibble tibble
 #' @export
 
-plots <- function(ssm, d, res) {
+plots <- function(d) {
   
-  ssm %>% do(., plotf(., res))
-  
+  do(d, plt = try(plotf(.$ssm, res="low")))
   
 }

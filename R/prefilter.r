@@ -12,7 +12,8 @@
 #' observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
 #' "2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
 #' observed latitude in decimal degress. 
-#' 
+#' @param vmax the speed threshold in m/s
+#' @param w window size
 #' @return A tbl_df grouped by individual id is returned.
 #' 
 #' @author Ian Jonsen

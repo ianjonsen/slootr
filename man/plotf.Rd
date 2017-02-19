@@ -2,11 +2,11 @@
 % Please edit documentation in R/plotf.r
 \name{plotf}
 \alias{plotf}
-\title{Visual an \code{ssmTMB} fit to data as a map and as 1-d time-series}
+\title{Visualise a \code{ssmTMB} fit to data as a map and as 1-d time-series}
 \usage{
 plotf(ssm, res)
 }
 \description{
-Visual an \code{ssmTMB} fit to data as a map and as 1-d time-series
+Visualise a \code{ssmTMB} fit to data as a map and as 1-d time-series
 }
 

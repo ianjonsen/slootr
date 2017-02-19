@@ -14,6 +14,10 @@ prefilter(d, vmax = 10, w = 5)
 observation, values in ascending order of quality are "Z", "B", "A", "0", "1",
 "2", "3". "lon" is the observed longitude in decimal degrees. "lat" is the
 observed latitude in decimal degress.}
+
+\item{vmax}{the speed threshold in m/s}
+
+\item{w}{window size}
 }
 \value{
 A tbl_df grouped by individual id is returned.
